@@ -29,15 +29,15 @@ def splitIntoLines(txt,offset):
     isOMP, isComment,toStart,toEnd = False,False,'',' &'
     if txt.startswith('!$omp'):   # openmp line
         isOMP = True
-        toSplit = '(,)'
-        toStart = '!$omp& '
+        toSplit = r"(,)"
+        toStart = r"!$omp& "
     elif txt.startswith('!'):    # commented line
         isComment = True
-        toSplit = '( )'
-        toStart = '! '
-        toEnd   = ''
+        toSplit = r"( )"
+        toStart = r"! "
+        toEnd   = ""
     else:                        #usual code line
-        toSplit = '(\*|\+|,)'
+        toSplit = r"(\*|\+|,)"
 
     txt = re.split(toSplit,txt)
 
@@ -63,7 +63,7 @@ if PROGRAM_STATEMENT : code.insert(0,'program test')
 
 formatGroups={}  # collect format groups to replace inside the write statements
 for i in range(len(code)):
-    m = re.search('\s+(\d+)\s+format(\(.*\))',code[i])
+    m = re.search(r"\s+(\d+)\s+format(\(.*\))",code[i])
     if m:
         formatGroups[m.group(1)] = m.group(2)
         code[i] = ''
@@ -93,10 +93,10 @@ for i in range(len(code)-1,0,-1):
         code[i] = ''
         comment = False
     
-    m = re.search(  'write\([0-9* ]+,(\d+)\)',code[i]) # replace write formats
+    m = re.search(r"write\([0-9* ]+,(\d+)\)",code[i]) # replace write formats
     if m:
         form = formatGroups[ m.group(1)]
-        code[i] = re.sub('write\(([0-9* ]+),(\d+)\)' , r'write(\1,"{}")'.format(form), code[i])
+        code[i] = re.sub(r"write\(([0-9* ]+),(\d+)\)" , r'write(\1,"{}")'.format(form), code[i])
 
 
     # remove return end before stop
@@ -105,7 +105,7 @@ for i in range(len(code)-1,0,-1):
 
     if comment or not CONVERT_NUMBERED_DO : continue
     # numbered do blocks
-    m = re.search('\s+do\s+(\d+)', code[i])
+    m = re.search(r"\s+do\s+(\d+)", code[i])
     if m:  # found one numbered do
         doLabel = m.group(1)
         doLine  = m .group().strip()
@@ -119,7 +119,7 @@ for i in range(len(code)-1,0,-1):
                 break
         
         for j in range(i+1,len(code)):
-            m = re.search('\s+(\d+)\s+(\w+)', code[j])
+            m = re.search(r"\s+(\d+)\s+(\w+)", code[j])
             if m:
                 label = m.group(1)
                 if label == doLabel:
@@ -130,7 +130,7 @@ for i in range(len(code)-1,0,-1):
                     if m.group(2)=="continue":
                         code[j] = ''
                     else:
-                        code[j] = re.sub('^\s+(\d+)\s+','', code[j])
+                        code[j] = re.sub(r"^\s+(\d+)\s+",'', code[j])
                     break
 
 
@@ -169,12 +169,12 @@ for i in range(len(code)):
 
 # removes old style logical operator
 txt = '\n'.join(code)
-txt = re.sub('\.ge\.', ">=", txt)
-txt = re.sub('\.le\.', "<=", txt)
-txt = re.sub('\.eq\.', "==", txt)
-txt = re.sub('\.ne\.', "/=", txt)
-txt = re.sub('\.gt\.', ">", txt)
-txt = re.sub('\.lt\.', "<", txt)
+txt = re.sub(r"\.ge\.", ">=", txt)
+txt = re.sub(r"\.le\.", "<=", txt)
+txt = re.sub(r"\.eq\.", "==", txt)
+txt = re.sub(r"\.ne\.", "/=", txt)
+txt = re.sub(r"\.gt\.", ">", txt)
+txt = re.sub(r"\.lt\.", "<", txt)
 
 
 
